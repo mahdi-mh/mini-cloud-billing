@@ -284,7 +284,7 @@ return [
         'vendor' => env('MODULE_VENDOR', 'minicloud'),
         'author' => [
             'name' => env('MODULE_AUTHOR_NAME', 'Mahdi Mohammadi'),
-            'email' => env('MODULE_AUTHOR_EMAIL', 'n.widart@gmail.com'),
+            'email' => env('MODULE_AUTHOR_EMAIL', 'lord2350.mm@gmail.com'),
         ],
         'composer-output' => false,
     ],
