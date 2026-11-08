@@ -2,45 +2,28 @@
 
 namespace Modules\Billing\Providers;
 
-use Nwidart\Modules\Support\ModuleServiceProvider;
 use Illuminate\Console\Scheduling\Schedule;
+use Modules\Billing\Console\RunBillingCommand;
+use Nwidart\Modules\Support\ModuleServiceProvider;
 
 class BillingServiceProvider extends ModuleServiceProvider
 {
-    /**
-     * The name of the module.
-     */
     protected string $name = 'Billing';
 
-    /**
-     * The lowercase version of the module name.
-     */
     protected string $nameLower = 'billing';
 
-    /**
-     * Command classes to register.
-     *
-     * @var string[]
-     */
-    // protected array $commands = [];
+    protected array $commands = [
+        RunBillingCommand::class,
+    ];
 
-    /**
-     * Provider classes to register.
-     *
-     * @var string[]
-     */
     protected array $providers = [
         EventServiceProvider::class,
         RouteServiceProvider::class,
     ];
 
-    /**
-     * Define module schedules.
-     * 
-     * @param $schedule
-     */
-    // protected function configureSchedules(Schedule $schedule): void
-    // {
-    //     $schedule->command('inspire')->hourly();
-    // }
+    protected function configureSchedules(Schedule $schedule): void
+    {
+        // no overlap guard on purpose: running twice is safe, a stuck lock would not be
+        $schedule->command('billing:run')->everyMinute();
+    }
 }
