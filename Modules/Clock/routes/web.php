@@ -1,8 +1,3 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
-use Modules\Clock\Http\Controllers\ClockController;
-
-Route::middleware(['auth', 'verified'])->group(function () {
-    Route::resource('clocks', ClockController::class)->names('clock');
-});
+// no pages of its own: the clock control is a Livewire component used in the app layout
