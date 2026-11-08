@@ -2,17 +2,17 @@
 
 namespace Modules\Wallet\Support;
 
-use Illuminate\Support\Number;
-
 class Money
 {
-    /** Money is stored as integer cents; this is only for showing it. */
+    /** Money is stored as integer cents; this is only for showing it. No floats on the way. */
     public static function format(int $minor): string
     {
-        return Number::currency($minor / 100, 'USD');
+        $abs = abs($minor);
+
+        return ($minor < 0 ? '-' : '').'$'.number_format(intdiv($abs, 100)).'.'.str_pad((string) ($abs % 100), 2, '0', STR_PAD_LEFT);
     }
 
-    /** "12", "12.5" or "12.50" to 1250. Anything else is null: no floats on the way. */
+    /** "12", "12.5" or "12.50" to 1250. Anything else is null. */
     public static function parse(string $input): ?int
     {
         if (! preg_match('/^(\d{1,9})(?:\.(\d{1,2}))?$/', trim($input), $m)) {
