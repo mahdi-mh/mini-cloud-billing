@@ -35,13 +35,15 @@ services:
         <<: *app
         command: php artisan schedule:work
         restart: unless-stopped
-    # the fake infrastructure: same codebase, own process and own sqlite database
+    # the fake infrastructure: same codebase, own process and own sqlite database.
+    # (plain php -S, because `artisan serve` would drop FAKE_INFRA_SERVE)
     infra:
         <<: *app
         command: >
             sh -c "touch database/infra.sqlite &&
-            php artisan migrate --database=infra --path=Modules/FakeInfra/database/migrations --force &&
-            php artisan serve --host=0.0.0.0 --port=8000"
+            php artisan migrate --database=infra --path=Modules/FakeInfra/database/infra --force &&
+            cd public &&
+            php -S 0.0.0.0:8000 ../vendor/laravel/framework/src/Illuminate/Foundation/resources/server.php"
         environment:
             WWWUSER: '${WWWUSER}'
             LARAVEL_SAIL: 1
