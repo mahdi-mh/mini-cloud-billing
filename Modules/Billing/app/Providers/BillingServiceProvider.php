@@ -4,6 +4,8 @@ namespace Modules\Billing\Providers;
 
 use Illuminate\Console\Scheduling\Schedule;
 use Modules\Billing\Console\RunBillingCommand;
+use Livewire\Livewire;
+use Modules\Billing\Livewire\ServerCharges;
 use Nwidart\Modules\Support\ModuleServiceProvider;
 
 class BillingServiceProvider extends ModuleServiceProvider
@@ -25,5 +27,12 @@ class BillingServiceProvider extends ModuleServiceProvider
     {
         // no overlap guard on purpose: running twice is safe, a stuck lock would not be
         $schedule->command('billing:run')->everyMinute();
+    }
+
+    public function boot(): void
+    {
+        parent::boot();
+
+        Livewire::component('billing.server-charges', ServerCharges::class);
     }
 }

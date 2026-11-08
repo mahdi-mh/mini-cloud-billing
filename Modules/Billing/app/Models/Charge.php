@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 use Modules\Billing\Database\Factories\ChargeFactory;
 use Modules\Billing\Enums\BillableType;
 use Modules\Customers\Models\Customer;
+use Modules\Network\Models\IpAddress;
 use Modules\Servers\Models\Server;
 use Modules\Wallet\Models\LedgerEntry;
 
@@ -41,6 +42,12 @@ class Charge extends Model
     public function server(): BelongsTo
     {
         return $this->belongsTo(Server::class);
+    }
+
+    /** Only for ip charges: billable_id is the address. */
+    public function ipAddress(): BelongsTo
+    {
+        return $this->belongsTo(IpAddress::class, 'billable_id');
     }
 
     /** The money movement this charge made. */

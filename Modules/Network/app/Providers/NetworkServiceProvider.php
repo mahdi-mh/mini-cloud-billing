@@ -5,6 +5,8 @@ namespace Modules\Network\Providers;
 use Modules\Network\Console\MoveIpCommand;
 use Modules\Network\Services\IpService;
 use Modules\Servers\Interfaces\AllocatesIp;
+use Livewire\Livewire;
+use Modules\Network\Livewire\ServerIps;
 use Nwidart\Modules\Support\ModuleServiceProvider;
 
 class NetworkServiceProvider extends ModuleServiceProvider
@@ -27,5 +29,12 @@ class NetworkServiceProvider extends ModuleServiceProvider
         parent::register();
 
         $this->app->bind(AllocatesIp::class, IpService::class);
+    }
+
+    public function boot(): void
+    {
+        parent::boot();
+
+        Livewire::component('network.server-ips', ServerIps::class);
     }
 }

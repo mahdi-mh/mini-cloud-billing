@@ -23,6 +23,7 @@
     </source>
     <php>
         <env name="APP_ENV" value="testing"/>
+        <env name="APP_KEY" value="base64:KZrqLTZi056PtkAj8L9LpdctPFVeMCz8sSD0/2G9AsE="/>
         <env name="FAKE_INFRA_SERVE" value="true"/>
         <env name="INFRA_DB_DATABASE" value=":memory:"/>
         <env name="APP_MAINTENANCE_DRIVER" value="file"/>
