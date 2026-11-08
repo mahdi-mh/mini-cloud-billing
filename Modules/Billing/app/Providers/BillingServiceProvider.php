@@ -3,8 +3,9 @@
 namespace Modules\Billing\Providers;
 
 use Illuminate\Console\Scheduling\Schedule;
-use Modules\Billing\Console\RunBillingCommand;
 use Livewire\Livewire;
+use Modules\Billing\Console\ChangePriceCommand;
+use Modules\Billing\Console\RunBillingCommand;
 use Modules\Billing\Livewire\ServerCharges;
 use Nwidart\Modules\Support\ModuleServiceProvider;
 
@@ -16,6 +17,7 @@ class BillingServiceProvider extends ModuleServiceProvider
 
     protected array $commands = [
         RunBillingCommand::class,
+        ChangePriceCommand::class,
     ];
 
     protected array $providers = [
