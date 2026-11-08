@@ -4,6 +4,7 @@ namespace Modules\FakeInfra\Providers;
 
 use Illuminate\Foundation\Support\Providers\RouteServiceProvider as ServiceProvider;
 use Illuminate\Support\Facades\Route;
+use Modules\FakeInfra\Http\Middleware\FlakyInfra;
 
 class RouteServiceProvider extends ServiceProvider
 {
@@ -34,6 +35,13 @@ class RouteServiceProvider extends ServiceProvider
      */
     protected function mapWebRoutes(): void
     {
-        Route::middleware('web')->group(module_path($this->name, '/routes/web.php'));
+        // only the infra process exposes the fake API
+        if (! config('fakeinfra.serve')) {
+            return;
+        }
+
+        Route::middleware(['api', FlakyInfra::class])
+            ->prefix('infra')
+            ->group(module_path($this->name, '/routes/api.php'));
     }
 }

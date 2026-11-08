@@ -43,6 +43,14 @@ return [
             'transaction_mode' => 'DEFERRED',
         ],
 
+        // the fake infrastructure service keeps its own state, away from the app database
+        'infra' => [
+            'driver' => 'sqlite',
+            'database' => env('INFRA_DB_DATABASE', database_path('infra.sqlite')),
+            'prefix' => '',
+            'foreign_key_constraints' => true,
+        ],
+
         'mysql' => [
             'driver' => 'mysql',
             'url' => env('DB_URL'),
