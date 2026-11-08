@@ -39,6 +39,10 @@ trait FakesInfra
 
     private function infraAnswer(string $method, string $token)
     {
+        if ($method === 'GET' && $token === 'servers') {
+            return Http::response(['servers' => collect($this->infra)->map(fn ($state, $t) => ['token' => $t, 'state' => $state])->values()->all()]);
+        }
+
         return match ($method) {
             'PUT' => Http::response(['state' => $this->infra[$token] ??= 'creating'], 201),
             'DELETE' => isset($this->infra[$token])

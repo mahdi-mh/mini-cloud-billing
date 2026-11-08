@@ -3,6 +3,7 @@
 namespace Modules\Servers\Providers;
 
 use Illuminate\Console\Scheduling\Schedule;
+use Modules\Servers\Console\ReconcileServersCommand;
 use Modules\Servers\Console\SyncServersCommand;
 use Livewire\Livewire;
 use Modules\Servers\Livewire\CustomerServers;
@@ -16,6 +17,7 @@ class ServersServiceProvider extends ModuleServiceProvider
 
     protected array $commands = [
         SyncServersCommand::class,
+        ReconcileServersCommand::class,
     ];
 
     protected array $providers = [
@@ -26,6 +28,7 @@ class ServersServiceProvider extends ModuleServiceProvider
     protected function configureSchedules(Schedule $schedule): void
     {
         $schedule->command('servers:sync')->everyMinute();
+        $schedule->command('servers:reconcile')->everyFiveMinutes();
     }
 
     public function boot(): void
