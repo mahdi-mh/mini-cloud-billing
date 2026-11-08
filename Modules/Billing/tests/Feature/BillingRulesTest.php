@@ -19,6 +19,7 @@ use Modules\Servers\Enums\ServerStatus;
 use Modules\Servers\Models\Server;
 use Modules\Wallet\Models\LedgerEntry;
 use Modules\Wallet\Services\WalletService;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\TestCase;
 
 class BillingRulesTest extends TestCase
@@ -98,7 +99,7 @@ class BillingRulesTest extends TestCase
         $this->assertSame('2026-01-03 12', end($hours)); // no gaps: 10:00 on the 1st up to 12:00 on the 3rd
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('endings')]
+    #[DataProvider('endings')]
     public function test_billing_stops_with_the_end_of_usage(string $endedAt, int $expectedHours): void
     {
         $server = $this->runningServer();

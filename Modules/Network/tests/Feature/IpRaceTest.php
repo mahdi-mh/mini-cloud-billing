@@ -3,8 +3,8 @@
 namespace Modules\Network\Tests\Feature;
 
 use Illuminate\Foundation\Testing\DatabaseTruncation;
-use Illuminate\Support\Facades\Process;
 use Illuminate\Process\Pool;
+use Illuminate\Support\Facades\Process;
 use Modules\Clock\Tests\Concerns\FakesClock;
 use Modules\Customers\Models\Customer;
 use Modules\Network\Models\IpAddress;

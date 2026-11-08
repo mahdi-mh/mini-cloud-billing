@@ -23,7 +23,7 @@ class ServerFactory extends Factory
         ];
     }
 
-    public function running(string $startedAt = null): static
+    public function running(?string $startedAt = null): static
     {
         return $this->state(fn () => [
             'status' => ServerStatus::Running,

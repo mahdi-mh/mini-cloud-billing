@@ -2,11 +2,11 @@
 
 namespace Modules\Network\Providers;
 
+use Livewire\Livewire;
 use Modules\Network\Console\MoveIpCommand;
+use Modules\Network\Livewire\ServerIps;
 use Modules\Network\Services\IpService;
 use Modules\Servers\Interfaces\AllocatesIp;
-use Livewire\Livewire;
-use Modules\Network\Livewire\ServerIps;
 use Nwidart\Modules\Support\ModuleServiceProvider;
 
 class NetworkServiceProvider extends ModuleServiceProvider

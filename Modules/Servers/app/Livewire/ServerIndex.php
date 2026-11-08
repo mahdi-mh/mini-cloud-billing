@@ -2,6 +2,7 @@
 
 namespace Modules\Servers\Livewire;
 
+use Flux\Flux;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
@@ -99,7 +100,7 @@ class ServerIndex extends Component
 
         $this->reset('newName', 'newCustomer');
         $this->modal('new-server')->close();
-        \Flux\Flux::toast('Server requested. It will be running in a few seconds.');
+        Flux::toast('Server requested. It will be running in a few seconds.');
     }
 
     public function render(ServerSearch $search)

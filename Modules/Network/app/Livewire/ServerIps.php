@@ -2,6 +2,7 @@
 
 namespace Modules\Network\Livewire;
 
+use Flux\Flux;
 use Illuminate\Support\Facades\Gate;
 use Livewire\Component;
 use Modules\Network\Exceptions\IpMoveRefused;
@@ -28,7 +29,7 @@ class ServerIps extends Component
         try {
             $ips->addIp($this->server);
         } catch (NoFreeIpAddress|IpMoveRefused $e) {
-            \Flux\Flux::toast(text: $e->getMessage(), variant: 'danger');
+            Flux::toast(text: $e->getMessage(), variant: 'danger');
         }
     }
 
@@ -58,7 +59,7 @@ class ServerIps extends Component
         }
 
         $this->modal('move-ip')->close();
-        \Flux\Flux::toast('Address moved.');
+        Flux::toast('Address moved.');
     }
 
     public function render()

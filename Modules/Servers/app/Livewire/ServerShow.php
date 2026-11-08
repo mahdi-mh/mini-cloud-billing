@@ -2,6 +2,7 @@
 
 namespace Modules\Servers\Livewire;
 
+use Flux\Flux;
 use Illuminate\Support\Facades\Gate;
 use Livewire\Attributes\Title;
 use Livewire\Component;
@@ -24,7 +25,7 @@ class ServerShow extends Component
 
         $this->server = $servers->terminate($this->server);
         $this->modal('terminate')->close();
-        \Flux\Flux::toast('Termination requested. Billing for this server stopped.');
+        Flux::toast('Termination requested. Billing for this server stopped.');
     }
 
     public function render()

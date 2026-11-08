@@ -2,6 +2,7 @@
 
 namespace Modules\Wallet\Livewire;
 
+use Flux\Flux;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
@@ -49,7 +50,7 @@ class CustomerBalance extends Component
         $this->topUpKey = (string) Str::uuid();
         $this->modal('top-up')->close();
         $this->dispatch('wallet-updated');
-        \Flux\Flux::toast('Top-up recorded.');
+        Flux::toast('Top-up recorded.');
     }
 
     public function refund(WalletService $wallet): void
@@ -70,7 +71,7 @@ class CustomerBalance extends Component
         $this->refundKey = (string) Str::uuid();
         $this->modal('refund')->close();
         $this->dispatch('wallet-updated');
-        \Flux\Flux::toast('Refund recorded.');
+        Flux::toast('Refund recorded.');
     }
 
     private function cents(string $field): int

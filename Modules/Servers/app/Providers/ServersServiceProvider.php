@@ -3,9 +3,9 @@
 namespace Modules\Servers\Providers;
 
 use Illuminate\Console\Scheduling\Schedule;
+use Livewire\Livewire;
 use Modules\Servers\Console\ReconcileServersCommand;
 use Modules\Servers\Console\SyncServersCommand;
-use Livewire\Livewire;
 use Modules\Servers\Livewire\CustomerServers;
 use Nwidart\Modules\Support\ModuleServiceProvider;
 
