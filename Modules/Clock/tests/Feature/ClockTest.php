@@ -3,6 +3,7 @@
 namespace Modules\Clock\Tests\Feature;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Carbon;
 use Modules\Clock\Services\Clock;
 use Modules\Clock\Tests\Concerns\FakesClock;
 use Tests\TestCase;
