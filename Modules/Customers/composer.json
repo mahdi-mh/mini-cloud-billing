@@ -1,0 +1,30 @@
+{
+    "name": "minicloud/customers",
+    "description": "",
+    "authors": [
+        {
+            "name": "Mahdi Mohammadi",
+            "email": "lord2350.mm@gmail.com"
+        }
+    ],
+    "extra": {
+        "laravel": {
+            "providers": [],
+            "aliases": {
+
+            }
+        }
+    },
+    "autoload": {
+        "psr-4": {
+            "Modules\\Customers\\": "app/",
+            "Modules\\Customers\\Database\\Factories\\": "database/factories/",
+            "Modules\\Customers\\Database\\Seeders\\": "database/seeders/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Modules\\Customers\\Tests\\": "tests/"
+        }
+    }
+}

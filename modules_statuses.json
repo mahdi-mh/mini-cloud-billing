@@ -1,0 +1,9 @@
+{
+    "Clock": true,
+    "Customers": true,
+    "Wallet": true,
+    "Network": true,
+    "Servers": true,
+    "Billing": true,
+    "FakeInfra": true
+}

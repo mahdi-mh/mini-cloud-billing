@@ -1,0 +1,11 @@
+{
+    "name": "FakeInfra",
+    "alias": "fakeinfra",
+    "description": "",
+    "keywords": [],
+    "priority": 0,
+    "providers": [
+        "Modules\\FakeInfra\\Providers\\FakeInfraServiceProvider"
+    ],
+    "files": []
+}
