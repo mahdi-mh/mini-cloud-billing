@@ -51,6 +51,8 @@ services:
         restart: unless-stopped
     mysql:
         image: 'mysql:8.4'
+        # triggers (append-only ledger) need this when the binlog is on
+        command: --log-bin-trust-function-creators=1
         ports:
             - '${FORWARD_DB_PORT:-3306}:3306'
         environment:
