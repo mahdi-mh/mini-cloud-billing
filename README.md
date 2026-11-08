@@ -1,59 +1,86 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Mini Cloud billing desk
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Billing back office of a small cloud provider: customers with wallets, servers, IP addresses, hourly billing,
+an admin panel, and a fake infrastructure service that is slow, flaky and sometimes lies.
 
-## About Laravel
+Laravel 12 · Livewire 4 · Flux UI · MySQL · Sail · `nwidart/laravel-modules`
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+What matters here is how it behaves when things go wrong. Read [docs/notes.md](docs/notes.md) for the rules, the decisions,
+the challenges with the tests that prove them, and what is not safe yet. Diagrams are in [docs/diagrams](docs/diagrams) (Mermaid),
+the slides are [docs/presentation.pdf](docs/presentation.pdf).
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## Start it
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+```sh
+./start.sh
+```
 
-## Learning Laravel
+Needs only Docker (with compose). It builds the Sail image, starts everything, migrates, seeds and builds the assets.
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+| | |
+|---|---|
+| Admin panel | http://localhost:8085 |
+| phpMyAdmin | http://localhost:8086 (database `minicloud`, user `sail`) |
+| Fake infrastructure | http://localhost:8087/infra/servers |
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+Staff accounts (password `password`): `owner@minicloud.test`, `support@minicloud.test`, `viewer@minicloud.test`.
 
-## Laravel Sponsors
+Containers: `laravel.test` (web), `queue` (queue worker), `scheduler` (runs `billing:run` and `servers:sync` every minute,
+`servers:reconcile` every five), `infra` (the fake infrastructure, its own sqlite database), `mysql`, `phpmyadmin`.
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+Local ports can be changed in `.env` (`APP_PORT`, `FORWARD_DB_PORT`, `PMA_PORT`, `INFRA_PORT`).
 
-### Premium Partners
+## Run the tests
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+```sh
+docker compose exec -u sail laravel.test php artisan test
+```
 
-## Contributing
+They use the `testing` database that Sail creates in MySQL. Some of them start real `php artisan` processes
+(parallel billing runs, a run that is killed halfway, two IP moves at once), so they take about half a minute.
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+The test for stale search results runs in a real browser against the running stack (needs Chrome on the machine running it):
 
-## Code of Conduct
+```sh
+docker compose exec -u sail laravel.test php artisan db:seed --class=DemoSeeder   # servers named alpha-*, beta-*, ..
+npm install && npm run test:browser          # CHROME_PATH and BASE_URL can be set
+```
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+## Demo it
 
-## Security Vulnerabilities
+1. Sign in as `owner`. Open **Servers**, search, filter, sort, reload: the state is in the URL.
+2. **New server** for a customer. It is `pending`, then `running` after a few seconds, although the infra fails
+   20 % of its calls and lies in another 20 % (`FAKE_INFRA_FAIL_RATE`, `FAKE_INFRA_LIE_RATE`, `FAKE_INFRA_CREATE_DELAY` in `.env`,
+   then `docker compose up -d infra`). Open the server page: its address, billing history, **Add an address**, **Move**, **Terminate**.
+3. Move the clock: **+1h** / **+1d** at the bottom of the sidebar (owner only), or `docker compose exec -u sail laravel.test php artisan clock:advance "3 hours"`.
+   The scheduler bills within a minute; or run it yourself: `php artisan billing:run`. Run it as often as you like, the numbers do not change.
+4. Open the customer: balance, money history, servers with their statuses (verified and suspended can both be set).
+   The owner can **Top up** and **Refund**; sign in as `support` or `viewer` and the buttons are gone, and the server refuses the calls anyway.
+5. Try `/servers?colour=red` or `/servers?status=banana`: refused with 422, not ignored.
+6. Make the infra drift and let the check repair it: `php artisan servers:reconcile`.
+7. A new price from the next hour on: `php artisan billing:price server 20`.
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+## Layout
 
-## License
+```
+Modules/
+  Clock/      the app clock (the only "now" for billing), advance/set commands, sidebar control
+  Customers/  customers, their statuses, pages
+  Wallet/     append-only ledger, top-up/refund with idempotency keys, customer money pages
+  Network/    the IP pool, assignments, move, pages
+  Servers/    servers, infra client, sync job, drift check, pages
+  Billing/    prices, charges, the billing run, server billing history
+  FakeInfra/  the fake infrastructure service (only serves routes when FAKE_INFRA_SERVE=true)
+app/          staff users and roles (Gates), login, the strict-query middleware
+docs/         notes, diagrams (Mermaid), slides
+```
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+Roles are Gates (`app/Providers/AppServiceProvider.php`): `manage-money` and `manage-clock` are owner only,
+`manage-infrastructure` is owner and support, viewers only read. Every Livewire action calls `Gate::authorize`, the buttons are only hidden in addition.
+
+## Without Docker
+
+Possible with PHP 8.3+, MySQL 8 and Composer: `composer install`, copy `.env.example` to `.env`, point `DB_HOST` at your MySQL
+(and create a `testing` database for the tests), `php artisan key:generate`, `php artisan migrate --seed`, `npm install && npm run build`,
+then run `php artisan serve`, `php artisan queue:work` and `php artisan schedule:work`. The fake infra needs
+`FAKE_INFRA_SERVE=true php artisan migrate --database=infra --path=Modules/FakeInfra/database/infra` and a second server process, see `compose.yaml`.

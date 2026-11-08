@@ -1,0 +1,74 @@
+erDiagram
+    users {
+        bigint id PK
+        string email UK
+        enum role "owner | support | viewer"
+    }
+    customers {
+        bigint id PK
+        string email UK
+    }
+    customer_statuses {
+        bigint id PK
+        bigint customer_id FK
+        enum status "verified | suspended"
+        datetime since
+    }
+    ledger_entries {
+        bigint id PK
+        bigint customer_id FK
+        enum type "topup | charge | refund"
+        bigint amount "signed cents; CHECK sign matches type"
+        string idempotency_key UK "same key = same movement"
+        string reference_type "charge"
+        bigint reference_id "charges.id"
+        datetime created_at "TRIGGER: no update, no delete"
+    }
+    servers {
+        bigint id PK
+        bigint customer_id FK
+        uuid infra_token UK "what the infra knows it as"
+        enum status "pending | running | terminating | terminated | failed"
+        datetime started_at "billing starts"
+        datetime ended_at "billing ends; CHECK ended_at >= started_at"
+    }
+    ip_addresses {
+        bigint id PK
+        string address UK "fixed pool"
+    }
+    ip_assignments {
+        bigint id PK
+        bigint ip_address_id FK
+        bigint server_id FK
+        datetime started_at
+        datetime ended_at "CHECK ended_at >= started_at"
+        bigint open_ip_id UK "generated: ip id while open, NULL when closed"
+    }
+    prices {
+        bigint id PK
+        enum type "server | ip"
+        bigint amount "CHECK > 0"
+        datetime effective_from "UK with type"
+    }
+    charges {
+        bigint id PK
+        bigint customer_id FK
+        enum billable_type "server | ip"
+        bigint billable_id "server id or ip address id"
+        datetime hour_start "UK with billable_type + billable_id"
+        bigint amount "CHECK > 0"
+        bigint server_id FK
+    }
+    clock_state {
+        tinyint id PK "CHECK id = 1"
+        datetime now
+    }
+
+    customers ||--o{ customer_statuses : has
+    customers ||--o{ ledger_entries : money
+    customers ||--o{ servers : owns
+    servers ||--o{ ip_assignments : holds
+    ip_addresses ||--o{ ip_assignments : "sits on"
+    customers ||--o{ charges : pays
+    servers ||--o{ charges : "for"
+    charges ||--o| ledger_entries : "made by (reference_id)"

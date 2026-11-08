@@ -1,0 +1,10 @@
+stateDiagram-v2
+    [*] --> pending: create (server row + IP reserved in one transaction)
+    pending --> running: infra says running, started_at = clock
+    pending --> failed: infra says stopped/deleted,<br/>or never ready after N passes<br/>(IPs released, delete sent to infra)
+    pending --> terminating: terminate requested
+    running --> terminating: terminate requested<br/>ended_at = clock, IPs released
+    running --> terminated: drift check: gone from the infra
+    terminating --> terminated: infra says deleted or unknown
+    terminated --> [*]
+    failed --> [*]

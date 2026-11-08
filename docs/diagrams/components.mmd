@@ -1,0 +1,20 @@
+flowchart LR
+    browser["Browser<br/>Livewire + Flux"]
+
+    subgraph sail["docker compose"]
+        app["laravel.test<br/>web (Livewire pages)"]
+        queue["queue<br/>queue:work"]
+        scheduler["scheduler<br/>schedule:work"]
+        infra["infra<br/>fake infrastructure<br/>(own sqlite db)"]
+        mysql[("mysql<br/>app database + job queue")]
+        pma["phpMyAdmin"]
+    end
+
+    browser -->|HTTP, /livewire/update| app
+    app -->|SQL| mysql
+    app -->|dispatch SyncServer| mysql
+    queue -->|reads jobs, SQL| mysql
+    queue -->|"HTTP: GET / PUT / DELETE /infra/servers/token"| infra
+    scheduler -->|"billing:run (1 min)<br/>servers:sync (1 min)<br/>servers:reconcile (5 min)"| mysql
+    scheduler -->|"servers:reconcile: GET /infra/servers"| infra
+    pma --> mysql

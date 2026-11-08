@@ -1,0 +1,5 @@
+stateDiagram-v2
+    [*] --> free: seeded into the pool
+    free --> assigned: server created / "add an address"<br/>(new open ip_assignment)
+    assigned --> assigned: move to another server<br/>(close old + open new at the same instant)
+    assigned --> free: server terminated or failed<br/>(assignment closed)

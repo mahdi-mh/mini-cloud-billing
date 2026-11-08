@@ -1,0 +1,15 @@
+flowchart TB
+    Billing --> Wallet
+    Billing --> Network
+    Billing --> Servers
+    Billing --> Customers
+    Billing --> Clock
+    Network --> Servers
+    Network --> Clock
+    Servers --> Network
+    Servers --> Customers
+    Servers --> Clock
+    Wallet --> Customers
+    Wallet --> Clock
+    Customers --> Clock
+    Servers -- "HTTP (InfraClient)" --> FakeInfra["FakeInfra<br/>(separate process,<br/>depends on nothing)"]

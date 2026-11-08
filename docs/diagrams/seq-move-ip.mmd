@@ -1,0 +1,19 @@
+sequenceDiagram
+    actor S1 as Support (tab 1)
+    actor S2 as Support (tab 2)
+    participant N as IpService.move
+    participant DB as MySQL
+
+    S1->>N: move(ip, from = A, to = B)
+    S2->>N: move(ip, from = A, to = C)
+    N->>DB: BEGIN, SELECT ip FOR UPDATE (tab 1 gets the lock)
+    Note over N,DB: tab 2 waits here
+    N->>DB: open assignment is on A? yes
+    N->>DB: lock target server B, must be pending/running
+    N->>DB: A keeps at least one other address?
+    N->>DB: UPDATE old assignment: ended_at = clock
+    N->>DB: INSERT assignment on B, started_at = same clock value
+    N->>DB: COMMIT
+    N->>DB: (tab 2) SELECT ip FOR UPDATE, open assignment is on B, not A
+    N-->>S2: IpMoveRefused "no longer on that server"
+    Note over DB: without the lock the unique index on<br/>open_ip_id still refuses a second open assignment

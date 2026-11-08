@@ -1,0 +1,29 @@
+sequenceDiagram
+    actor Staff
+    participant UI as ServerIndex (Livewire)
+    participant S as ServerService
+    participant DB as MySQL
+    participant Q as queue worker
+    participant Y as ServerSyncer
+    participant I as Infra (flaky, lies)
+
+    Staff->>UI: New server
+    UI->>S: create(customer, name)
+    S->>DB: BEGIN
+    S->>DB: INSERT server (pending, infra_token = uuid)
+    S->>DB: allocate IP (SELECT .. SKIP LOCKED, INSERT open assignment)
+    Note over DB: pool empty -> exception -> ROLLBACK, no server
+    S->>DB: COMMIT
+    S-->>Q: SyncServer(id) after commit
+    loop until running (every 3 s, max N passes)
+        Q->>Y: sync(server)
+        Y->>I: GET /servers/token
+        alt unknown (404)
+            Y->>I: PUT /servers/token
+            Note over I: 503: did nothing. 500: did it anyway.<br/>Same token, so asking again never makes a second server.
+        else creating
+            Note over Y: wait for the next pass
+        else running
+            Y->>DB: UPDATE status = running, started_at = clock WHERE status = pending
+        end
+    end

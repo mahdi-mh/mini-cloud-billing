@@ -1,0 +1,14 @@
+sequenceDiagram
+    actor U as Staff
+    participant L as Livewire (browser)
+    participant W as ServerIndex (server)
+
+    U->>L: types "alpha"
+    L->>W: update q=alpha (slow, 3 s)
+    U->>L: types "beta"
+    L->>L: new wire:model.live action supersedes the one in flight
+    L->>W: update q=beta
+    W-->>L: results for beta
+    L->>L: render beta, URL becomes ?q=beta
+    W-->>L: results for alpha (arrives late)
+    Note over L: the superseded response is thrown away

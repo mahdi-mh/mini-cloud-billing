@@ -1,0 +1,16 @@
+sequenceDiagram
+    participant A as billing:run (A)
+    participant B as billing:run (B, same moment)
+    participant DB as MySQL
+
+    A->>DB: read clock, servers and ip assignments
+    B->>DB: read clock, servers and ip assignments
+    Note over A,B: each works out ALL hours due up to now<br/>(a long pause just means more hours)
+    A->>DB: BEGIN, INSERT charge (server 7, 10:00)
+    B->>DB: BEGIN, INSERT charge (server 7, 10:00)
+    Note over B,DB: B waits on the unique key<br/>(billable_type, billable_id, hour_start)
+    A->>DB: INSERT ledger entry (key charge:server:7:...T10)
+    A->>DB: COMMIT
+    DB-->>B: duplicate key
+    Note over B: skipped, nothing written
+    Note over A: if A dies before COMMIT, MySQL rolls back:<br/>no charge without its money movement, B or the next run does it
