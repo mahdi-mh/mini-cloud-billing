@@ -49,7 +49,7 @@ Deploy is serialized with flock. It builds before stopping the previous services
 Use the same flags for all commands (the deploy script sets RELEASE from the current Git commit):
 
 ```sh
-export RELEASE="$(git rev-parse --short=12 HEAD)"
+export RELEASE="$(git -c safe.directory="$PWD" rev-parse --short=12 HEAD)"
 docker compose --env-file .env.production -f compose.production.yaml ps
 docker compose --env-file .env.production -f compose.production.yaml logs --tail=100 web queue scheduler infra mysql
 curl --fail http://127.0.0.1:8085/up

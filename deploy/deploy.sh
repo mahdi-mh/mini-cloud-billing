@@ -5,7 +5,8 @@ cd "$(dirname "$0")/.."
 exec 9>/tmp/minicloud-deploy.lock
 flock -n 9 || { echo 'Another deployment is running.' >&2; exit 1; }
 [ -f .env.production ] || { echo 'Create .env.production first.' >&2; exit 1; }
-export RELEASE="$(git rev-parse --short=12 HEAD)"
+RELEASE="$(git -c safe.directory="$PWD" rev-parse --short=12 HEAD)"
+export RELEASE
 dc() { docker compose --env-file .env.production -f compose.production.yaml "$@"; }
 dc config --quiet
 dc build web
