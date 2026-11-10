@@ -84,3 +84,7 @@ Possible with PHP 8.3+, MySQL 8 and Composer: `composer install`, copy `.env.exa
 (and create a `testing` database for the tests), `php artisan key:generate`, `php artisan migrate --seed`, `npm install && npm run build`,
 then run `php artisan serve`, `php artisan queue:work` and `php artisan schedule:work`. The fake infra needs
 `FAKE_INFRA_SERVE=true php artisan migrate --database=infra --path=Modules/FakeInfra/database/infra` and a second server process, see `compose.yaml`.
+
+## Server deployment
+
+For a Docker deployment in `/var/www/minicloud`, use the separate [server deployment guide](deploy/README.md) and `compose.production.yaml`. The Sail setup above is for local development.
