@@ -31,7 +31,7 @@ ssh -N -L 8085:127.0.0.1:8085 root@SERVER_IP
 # then open http://localhost:8085
 ```
 
-For public access, add an HTTPS reverse proxy on the host, set APP_URL to its HTTPS origin, enable SESSION_SECURE_COOKIE, and configure trusted proxies correctly if TLS terminates before PHP. Do not publish the current HTTP port to all interfaces. Existing SSH access is preserved; changing the company root credentials or SSH policy needs coordination with the server owner.
+For public access, add an HTTPS reverse proxy on the host, set APP_URL to its HTTPS origin, enable SESSION_SECURE_COOKIE, and configure trusted proxies correctly if TLS terminates before PHP. For explicitly requested direct public HTTP access, set `WEB_BIND_ADDRESS=0.0.0.0` and `APP_URL=http://SERVER_IP:8085` in `.env.production`, then recreate web. This sends credentials over unencrypted HTTP; prefer HTTPS for ongoing use. The default remains loopback-only. Existing SSH access is preserved; changing the company root credentials or SSH policy needs coordination with the server owner.
 
 ## Updates
 

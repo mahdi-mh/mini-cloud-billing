@@ -20,7 +20,7 @@ x-app: &app
 services:
   web:
     <<: *app
-    ports: ['127.0.0.1:8085:80']
+    ports: ['${WEB_BIND_ADDRESS:-127.0.0.1}:8085:80']
     mem_limit: 192m
     healthcheck:
       test: [CMD, php, -r, "exit(@file_get_contents('http://127.0.0.1/up') === false ? 1 : 0);"]
